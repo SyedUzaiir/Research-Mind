@@ -17,6 +17,7 @@ from app.services.chunker import SemanticChunker
 from app.services.vector_store import VectorStoreService
 from app.services.rag_engine import RAGEngine
 from app.services.synthesis import SynthesisService
+from app.services.semantic_scholar import SemanticScholarService
 
 logger = logging.getLogger("rag_router")
 router = APIRouter(prefix="/api/v1", tags=["RAG & Research AI"])
@@ -25,6 +26,7 @@ router = APIRouter(prefix="/api/v1", tags=["RAG & Research AI"])
 vector_service = VectorStoreService()
 rag_engine = RAGEngine()
 chunker = SemanticChunker()
+semantic_scholar = SemanticScholarService()
 
 # In-memory document storage fallback for rapid testing & local dev
 IN_MEMORY_CHUNKS: List[dict] = []
@@ -156,3 +158,13 @@ async def get_flashcards(paper_id: str):
     """Generates active-recall flashcards for a specific paper."""
     cards = SynthesisService.generate_flashcards("Target Paper", [])
     return FlashcardsResponse(paperId=paper_id, flashcards=cards)
+
+@router.get("/citation-graph/{paper_id}")
+async def get_citation_graph(paper_id: str):
+    """Fetches citation network data using Semantic Scholar API."""
+    data = await semantic_scholar.get_paper_citations(paper_id)
+    return {
+        "paperId": paper_id,
+        "citationData": data
+    }
+

@@ -77,10 +77,17 @@ All major changes, database updates, microservice additions, and pipeline enhanc
 
 ## [2026-09-15 07:44] - Team Section Update (Vardhaman College of Engineering, 2025–26)
 - **Scope:** Team Section Component (`frontend/src/components/team-section.tsx`)
-- **Summary:** Updated team section with exact metadata: **Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2025–26** and member profiles:
-  - **Syed Uzair Mohiuddin** (Badge `SU`, Full Stack & AI Engineer)
-  - **Sarasam Chinmaee Reddy** (Badge `SC`, AI Architect)
-  - **Manohar Yadav Boddu** (Badge `MY`, Machine Learning Engineer)
+- **Summary:** Updated team section with exact metadata: **Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2025–26** and member profiles (Syed Uzair Mohiuddin, Sarasam Chinmaee Reddy, Manohar Yadav Boddu).
 - **Files Modified:**
   - `frontend/src/components/team-section.tsx`
+
+---
+
+## [2026-09-15 19:50] - Semantic Scholar API Key Integration
+- **Scope:** Python AI Engine (`backend-ai/app/services/semantic_scholar.py`)
+- **Summary:** Added `SEMANTIC_SCHOLAR_API_KEY` configuration to `backend-ai/.env` and built `SemanticScholarService` to fetch paper forward/backward citations with authenticated rate limit support (`x-api-key`). Exposed GET `/api/v1/citation-graph/{paper_id}` route.
+- **Files Created/Modified:**
+  - `backend-ai/.env`
+  - `backend-ai/app/services/semantic_scholar.py`
+  - `backend-ai/app/routers/rag.py`
 - **Docs Updated:** `HISTORY.md`

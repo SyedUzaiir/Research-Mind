@@ -1,4 +1,4 @@
-// AntiGravity AI — Prisma Schema Definition with pgvector support
+// ResearchMind — Prisma Schema Definition with pgvector support
 
 generator client {
   provider        = "prisma-client-js"
