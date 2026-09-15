@@ -1,0 +1,51 @@
+# ResearchMind Cloud Infrastructure Manifest for Render Deployment
+
+services:
+  # 1. FastAPI Python AI Engine (PDF Parsing, pgvector RRF Search, RAG & Synthesis)
+  - type: web
+    name: researchmind-ai
+    env: python
+    region: singapore
+    plan: free
+    rootDir: backend-ai
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    envVars:
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: SEMANTIC_SCHOLAR_API_KEY
+        sync: false
+
+  # 2. Node.js / Express Core API Gateway (Auth, Workspaces, Papers & Prisma ORM)
+  - type: web
+    name: researchmind-core
+    env: node
+    region: singapore
+    plan: free
+    rootDir: backend-core
+    buildCommand: npm install && npm run build && npx prisma generate
+    startCommand: node dist/server.js
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+
+  # 3. Next.js 14 App Router Frontend Workspace (Split-Screen Viewer & Dashboards)
+  - type: web
+    name: researchmind-frontend
+    env: node
+    region: singapore
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_CORE_API_URL
+        value: https://researchmind-core.onrender.com/api
+      - key: NEXT_PUBLIC_AI_API_URL
+        value: https://researchmind-ai.onrender.com/api/v1

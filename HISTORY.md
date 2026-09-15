@@ -90,4 +90,16 @@ All major changes, database updates, microservice additions, and pipeline enhanc
   - `backend-ai/.env`
   - `backend-ai/app/services/semantic_scholar.py`
   - `backend-ai/app/routers/rag.py`
-- **Docs Updated:** `HISTORY.md`
+
+---
+
+## [2026-09-15 20:04] - Supabase PostgreSQL Database Migration & Cloud Infrastructure Manifest
+- **Scope:** Database Verification & Cloud Deployment Configuration
+- **Summary:** Created database verification script (`backend-core/src/scripts/verify-db.ts`) which verified live connection to Supabase PostgreSQL and confirmed `pgvector` extension v0.8.2 activity. Executed `npx prisma db push` sync creating all tables (`users`, `workspaces`, `papers`, `paper_chunks`, `annotations`, `chat_histories`, `flashcards`, `synthesis_reports`). Created root `render.yaml` infrastructure manifest and Dockerfiles for `backend-ai`, `backend-core`, and `frontend`.
+- **Files Created/Modified:**
+  - `backend-core/src/scripts/verify-db.ts`
+  - `render.yaml`
+  - `backend-ai/Dockerfile`
+  - `backend-core/Dockerfile`
+  - `frontend/Dockerfile`
+- **Docs Updated:** `HISTORY.md`, `PROGRESS_REPORT.md`
