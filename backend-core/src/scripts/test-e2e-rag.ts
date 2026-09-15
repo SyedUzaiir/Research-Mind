@@ -153,29 +153,29 @@ async function runE2ETests() {
     console.log('4. REAL PDF INGESTION PIPELINE TEST');
     console.log('--------------------------------------------------');
 
-    const fixturePath = path.join(__dirname, '../../../backend-ai/tests/fixtures/test-paper.pdf');
+    const fixturePath = path.join(__dirname, '../../../backend-ai/tests/fixtures/test-5page-paper.pdf');
     console.log(`  - Target PDF Fixture: ${fixturePath}`);
     const fixtureExists = fs.existsSync(fixturePath);
-    console.log(`  - PDF Fixture Exists: ${fixtureExists}`);
+    console.log(`  - 5-Page PDF Fixture Exists: ${fixtureExists}`);
 
     if (fixtureExists) {
       // Ingest via backend-ai
       const ingestPayload = {
-        paperId: 'paper-e2e-fixture-1',
+        paperId: 'paper-e2e-fixture-5page',
         filePath: fixturePath,
-        title: 'ResearchMind Architecture and Retrieval Specifications',
-        authors: ['Vardhaman Team'],
+        title: 'ResearchMind Multi-Page Test Specifications',
+        authors: ['ResearchMind Team'],
         year: 2026,
       };
 
       const ingestRes = await postJson('http://localhost:8000/api/v1/ingest-paper', ingestPayload);
       console.log(`  - /api/v1/ingest-paper Response: Code ${ingestRes.status}, Total Chunks: ${ingestRes.data.totalChunks}`);
 
-      if (ingestRes.status === 200 && ingestRes.data.totalChunks > 0) {
+      if (ingestRes.status === 200 && ingestRes.data.totalChunks >= 5) {
         testResults.pdfIngestion = 'PASS';
-        console.log('  -> Result: PASS 🟢\n');
+        console.log('  -> Multi-Page PDF Ingestion PASS 🟢 (Parsed all 5 distinct pages)\n');
       } else {
-        console.log('  -> Result: FAIL\n');
+        console.log('  -> Result: FAIL (Expected at least 5 chunks for 5 pages)\n');
       }
     } else {
       console.log('  -> Result: FAIL (Fixture missing)\n');
@@ -188,7 +188,7 @@ async function runE2ETests() {
     console.log('--------------------------------------------------');
 
     const chatQueryPayload = {
-      paperId: 'paper-e2e-fixture-1',
+      paperId: 'paper-e2e-fixture-5page',
       workspaceId: 'ws-e2e-1',
       question: 'What retrieval fusion technique does ResearchMind use?',
     };

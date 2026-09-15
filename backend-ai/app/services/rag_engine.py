@@ -155,3 +155,40 @@ class RAGEngine:
             "answer": fallback_answer,
             "citations": citations
         }
+
+    def generate_summary(self, chunks: List[Dict[str, Any]], length: str = "medium") -> str:
+        """Generates an executive summary of paper text chunks using Gemini or OpenAI."""
+        if not chunks:
+            return "No document text available to generate a summary."
+
+        combined_text = "\n\n".join([c["text"] for c in chunks[:10]])
+        length_instruction = {
+            "short": "Provide a concise 5-line executive summary of this research paper.",
+            "medium": "Provide a comprehensive 1-page structured summary covering background, key methods, results, and conclusions.",
+            "detailed": "Provide an in-depth detailed technical summary covering motivation, system architecture, experimental setup, quantitative results, and limitations."
+        }.get(length, "Provide a structured summary of this paper.")
+
+        prompt = f"{length_instruction}\n\nPAPER CONTENT:\n{combined_text[:6000]}"
+
+        if self.gemini_model:
+            try:
+                response = self.gemini_model.generate_content(prompt)
+                return response.text.strip()
+            except Exception as e:
+                logger.error(f"Gemini summary generation error: {e}")
+
+        if self.openai_client:
+            try:
+                response = self.openai_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.3
+                )
+                return response.choices[0].message.content.strip()
+            except Exception as e:
+                logger.error(f"OpenAI summary generation error: {e}")
+
+        # Intelligent extractive summary fallback
+        first_chunk = chunks[0]["text"] if chunks else ""
+        return f"### Executive Summary ({length.capitalize()} Mode)\n\n{first_chunk[:500]}...\n\n*(Connect GEMINI_API_KEY for dynamic abstract synthesis)*"
+

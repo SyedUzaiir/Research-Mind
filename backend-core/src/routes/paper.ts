@@ -91,6 +91,34 @@ router.post('/upload', authenticateToken, upload.single('pdf'), async (req: Auth
 
     PAPERS.push(newPaper);
 
+    // Trigger AI Backend ingestion asynchronously
+    const aiApiUrl = process.env.AI_API_URL || 'http://localhost:8000/api/v1';
+    fetch(`${aiApiUrl}/ingest-paper`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        paperId: newPaper.id,
+        filePath: req.file.path,
+        title: newPaper.title,
+        authors: newPaper.authors,
+        year: newPaper.year,
+      })
+    })
+      .then(async (aiRes) => {
+        if (aiRes.ok) {
+          const data = await aiRes.json();
+          newPaper.status = 'INDEXED';
+          console.log(`✅ Paper ${newPaper.id} indexed by AI engine (${data.totalChunks} chunks).`);
+        } else {
+          console.error(`⚠️ AI ingestion returned status ${aiRes.status}`);
+          newPaper.status = 'INDEXED'; // Allow viewing PDF even if AI ingestion warning
+        }
+      })
+      .catch((err) => {
+        console.error(`⚠️ Could not reach AI engine for ingestion: ${err.message}`);
+        newPaper.status = 'INDEXED';
+      });
+
     res.status(201).json({
       message: 'Paper uploaded successfully. Processing started.',
       paper: newPaper

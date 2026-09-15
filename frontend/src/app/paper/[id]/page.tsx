@@ -40,10 +40,18 @@ export default function PaperPage({ params }: { params: { id: string } }) {
   const [activeHighlightBox, setActiveHighlightBox] = useState<BoundingBox | null>(null);
   const [activePageNumber, setActivePageNumber] = useState<number>(1);
   const [summaryLength, setSummaryLength] = useState<'short' | 'medium' | 'detailed'>('medium');
+  const [summaryText, setSummaryText] = useState<string>('');
+  const [isSummaryLoading, setIsSummaryLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchPaperDetails = async () => {
       try {
+        const singlePaper = await ApiClient.getPaper(paperId);
+        if (singlePaper) {
+          setPaper(singlePaper);
+          return;
+        }
+
         const allPapers = await ApiClient.getPapers('ws-default-1');
         const found = allPapers.find(p => p.id === paperId);
         if (found) {
@@ -62,6 +70,16 @@ export default function PaperPage({ params }: { params: { id: string } }) {
     };
     fetchPaperDetails();
   }, [paperId]);
+
+  useEffect(() => {
+    if (activeRightTab === 'summaries' && paper.id) {
+      setIsSummaryLoading(true);
+      ApiClient.summarizePaper(paper.id, summaryLength)
+        .then(text => setSummaryText(text))
+        .catch(err => console.error('Summary error:', err))
+        .finally(() => setIsSummaryLoading(false));
+    }
+  }, [paper.id, activeRightTab, summaryLength]);
 
   const handleSelectCitation = (box: BoundingBox, pageNumber: number) => {
     setActiveHighlightBox(box);
@@ -103,6 +121,7 @@ export default function PaperPage({ params }: { params: { id: string } }) {
         <div className="col-span-7 h-full overflow-hidden">
           <PdfViewer
             paperTitle={paper.title}
+            fileUrl={paper.fileUrl}
             activeCitationBox={activeHighlightBox}
             activePageNumber={activePageNumber}
           />
@@ -200,13 +219,19 @@ export default function PaperPage({ params }: { params: { id: string } }) {
                 </div>
 
                 <div className="space-y-4 font-serif-paper text-zinc-800 dark:text-zinc-200 text-sm">
-                  <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-zinc-500">Executive Overview</h3>
-                  <p>
-                    Synthesized Summary for <strong>{paper.title}</strong>:
-                  </p>
-                  <p>
-                    This paper introduces a high-capacity algorithmic approach dispensing with classical recurrent dependencies, establishing state-of-the-art results across benchmark evaluation tasks.
-                  </p>
+                  <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-zinc-500">
+                    Executive Overview ({summaryLength.toUpperCase()})
+                  </h3>
+                  {isSummaryLoading ? (
+                    <div className="p-4 text-xs font-mono text-zinc-500 flex items-center space-x-2">
+                      <Sparkles className="w-4 h-4 animate-spin text-emerald-600" />
+                      <span>Synthesizing paper summary via PyMuPDF + Gemini...</span>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap leading-relaxed text-xs font-sans bg-zinc-50 dark:bg-zinc-950 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800">
+                      {summaryText || `Synthesized Summary for ${paper.title}...`}
+                    </div>
+                  )}
                 </div>
               </div>
             )}

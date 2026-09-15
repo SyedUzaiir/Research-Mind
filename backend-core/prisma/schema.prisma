@@ -109,7 +109,7 @@ model PaperChunk {
   paper       Paper                        @relation(fields: [paperId], references: [id], onDelete: Cascade)
   chunkIndex  Int
   text        String
-  embedding   Unsupported("vector(1536)")?
+  embedding   Unsupported("vector(768)")?
   pageNumber  Int
   boundingBox Json
   createdAt   DateTime                     @default(now())

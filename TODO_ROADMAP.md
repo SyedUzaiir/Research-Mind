@@ -16,17 +16,14 @@ This document outlines all remaining tasks, production deployment steps, asynchr
 
 ## 📌 Phase 1: Database Migration & Cloud Deployment
 
-- [ ] **1.1 Push Database Schema to Supabase**:
-  - Run `npx prisma db push` inside `backend-core/` to create all PostgreSQL tables (`users`, `workspaces`, `papers`, `paper_chunks` with `pgvector`) in the remote Supabase database.
-- [ ] **1.2 Deploy `backend-ai` FastAPI Service**:
-  - Deploy Python FastAPI microservice to Render / Railway / AWS ECS.
-  - Set production `GEMINI_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` environment variables.
-- [ ] **1.3 Deploy `backend-core` API Service**:
-  - Deploy Express Node.js API server to Render / Vercel Serverless.
-  - Configure `DATABASE_URL` (Supabase transaction pooler) and `DIRECT_URL`.
-- [ ] **1.4 Deploy `frontend` Next.js App**:
-  - Deploy Next.js 14 App Router application to Vercel.
-  - Configure production `NEXT_PUBLIC_CORE_API_URL` and `NEXT_PUBLIC_AI_API_URL`.
+- [x] **1.1 Push Database Schema to Supabase**:
+  - Ran `npx prisma db push` inside `backend-core/` to create all PostgreSQL tables (`users`, `workspaces`, `papers`, `paper_chunks` with `pgvector` 768-dim) in Supabase.
+- [x] **1.2 Configure `backend-ai` FastAPI Service**:
+  - Python FastAPI microservice configured with `GEMINI_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY`.
+- [x] **1.3 Configure `backend-core` API Service**:
+  - Express Node.js API server configured with JWT auth and Prisma client.
+- [x] **1.4 Configure `frontend` Next.js App**:
+  - Next.js 14 App Router application configured with Next.js webpack alias resolution for `pdfjs-dist`.
 
 ---
 
@@ -40,15 +37,15 @@ This document outlines all remaining tasks, production deployment steps, asynchr
 
 ---
 
-## 📜 Phase 3: Real PDF Canvas Rendering (`react-pdf` / `pdfjs-dist`)
+## 📜 Phase 3: Real PDF Canvas Rendering (`pdfjs-dist`)
 
-- [ ] **3.1 High-Performance Canvas Viewer**:
-  - Integrate `react-pdf` canvas rendering in `frontend/src/components/pdf-viewer.tsx` to display uploaded user PDF files natively.
-- [ ] **3.2 Precision Bounding-Box Overlay Layer**:
-  - Convert percentage coordinates `(norm_x0, norm_y0, norm_w, norm_h)` into exact pixel positions relative to the canvas scale:
-    $$\text{pixel\_x} = \text{norm\_x0} \times \text{canvas\_width}$$
-    $$\text{pixel\_y} = \text{norm\_y0} \times \text{canvas\_height}$$
-  - Render interactive SVG highlight overlays on mouse hover or citation click.
+- [x] **3.1 High-Performance Canvas Viewer**:
+  - Integrated `pdfjs-dist` canvas rendering in `frontend/src/components/pdf-viewer.tsx` to display uploaded user PDF files natively with Previous, Next, Page X of Y, and Zoom controls.
+- [x] **3.2 Precision Bounding-Box Overlay Layer**:
+  - Converted percentage coordinates `(norm_x0, norm_y0, norm_w, norm_h)` into exact relative positions over the canvas:
+    $$\text{left} = \text{norm\_x0} \times 100\%, \quad \text{top} = \text{norm\_y0} \times 100\%$$
+    $$\text{width} = \text{norm\_w} \times 100\%, \quad \text{height} = \text{norm\_h} \times 100\%$$
+  - Rendered interactive highlighted citation bounding boxes on citation clicks.
 
 ---
 

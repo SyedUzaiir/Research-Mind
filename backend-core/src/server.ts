@@ -21,8 +21,13 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Serve raw uploaded PDF files statically
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve raw uploaded PDF files statically with headers
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+  setHeaders: (res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  }
+}));
 
 // Routes
 app.use('/api/auth', authRoutes);

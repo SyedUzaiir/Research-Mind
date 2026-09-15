@@ -74,3 +74,13 @@ class Flashcard(BaseModel):
 class FlashcardsResponse(BaseModel):
     paperId: str
     flashcards: List[Flashcard]
+
+class SummarizeRequest(BaseModel):
+    paperId: str
+    length: Optional[str] = "medium" # "short", "medium", "detailed"
+
+class SummarizeResponse(BaseModel):
+    paperId: str
+    length: str
+    summary: str
+

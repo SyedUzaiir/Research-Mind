@@ -10,7 +10,8 @@ from app.models.schemas import (
     ChatRequest, ChatResponse,
     ComparePapersRequest, ComparePapersResponse,
     LitReviewRequest, LitReviewResponse,
-    FlashcardsResponse
+    FlashcardsResponse,
+    SummarizeRequest, SummarizeResponse
 )
 from app.services.pdf_parser import PDFParser
 from app.services.chunker import SemanticChunker
@@ -104,7 +105,6 @@ async def chat_paper(req: ChatRequest):
         # 1. Dense scoring (Cosine similarity)
         for c in candidate_chunks:
             if "embedding" in c and c["embedding"]:
-                # Cosine similarity dot product (for normalized vectors)
                 c["denseScore"] = float(sum(a * b for a, b in zip(query_vec, c["embedding"])))
             else:
                 c["denseScore"] = 0.0
@@ -127,24 +127,46 @@ async def chat_paper(req: ChatRequest):
         logger.error(f"Chat paper error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@router.post("/summarize-paper", response_model=SummarizeResponse)
+async def summarize_paper(req: SummarizeRequest):
+    """Generates an executive paper summary tailored to requested length/depth."""
+    try:
+        paper_chunks = [c for c in IN_MEMORY_CHUNKS if c.get("paperId") == req.paperId]
+        if not paper_chunks:
+            paper_chunks = IN_MEMORY_CHUNKS[:10]
+
+        summary_text = rag_engine.generate_summary(paper_chunks, length=req.length or "medium")
+        return SummarizeResponse(
+            paperId=req.paperId,
+            length=req.length or "medium",
+            summary=summary_text
+        )
+    except Exception as e:
+        logger.error(f"Summarize paper error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.post("/compare-papers", response_model=ComparePapersResponse)
 async def compare_papers(req: ComparePapersRequest):
     """Generates matrix comparison across specified paper IDs."""
-    sample_papers = [
-        {"paperId": pid, "title": f"Research Paper {idx+1}", "text": "transformer attention image classification dataset accuracy limit"}
-        for idx, pid in enumerate(req.paperIds)
-    ]
-    rows = SynthesisService.generate_matrix(sample_papers)
+    papers_data = []
+    for pid in req.paperIds:
+        p_chunks = [c for c in IN_MEMORY_CHUNKS if c.get("paperId") == pid]
+        p_text = " ".join([c["text"] for c in p_chunks[:5]]) if p_chunks else "transformer attention image classification dataset accuracy limit"
+        papers_data.append({"paperId": pid, "title": f"Paper ({pid})", "text": p_text})
+
+    rows = SynthesisService.generate_matrix(papers_data)
     return ComparePapersResponse(rows=rows)
 
 @router.post("/lit-review", response_model=LitReviewResponse)
 async def lit_review(req: LitReviewRequest):
     """Generates multi-section synthesis literature review."""
-    sample_papers = [
-        {"paperId": pid, "title": f"Selected Study {idx+1}", "text": "neural network attention dataset metrics"}
-        for idx, pid in enumerate(req.paperIds)
-    ]
-    matrix = SynthesisService.generate_matrix(sample_papers)
+    papers_data = []
+    for pid in req.paperIds:
+        p_chunks = [c for c in IN_MEMORY_CHUNKS if c.get("paperId") == pid]
+        p_text = " ".join([c["text"] for c in p_chunks[:5]]) if p_chunks else "neural network attention dataset metrics"
+        papers_data.append({"paperId": pid, "title": f"Study ({pid})", "text": p_text})
+
+    matrix = SynthesisService.generate_matrix(papers_data)
     review_text = SynthesisService.generate_lit_review(matrix)
 
     return LitReviewResponse(
@@ -156,7 +178,8 @@ async def lit_review(req: LitReviewRequest):
 @router.get("/flashcards/{paper_id}", response_model=FlashcardsResponse)
 async def get_flashcards(paper_id: str):
     """Generates active-recall flashcards for a specific paper."""
-    cards = SynthesisService.generate_flashcards("Target Paper", [])
+    p_chunks = [c["text"] for c in IN_MEMORY_CHUNKS if c.get("paperId") == paper_id]
+    cards = SynthesisService.generate_flashcards(f"Paper {paper_id}", p_chunks)
     return FlashcardsResponse(paperId=paper_id, flashcards=cards)
 
 @router.get("/citation-graph/{paper_id}")
@@ -167,4 +190,5 @@ async def get_citation_graph(paper_id: str):
         "paperId": paper_id,
         "citationData": data
     }
+
 

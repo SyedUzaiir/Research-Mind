@@ -103,3 +103,32 @@ All major changes, database updates, microservice additions, and pipeline enhanc
   - `backend-core/Dockerfile`
   - `frontend/Dockerfile`
 - **Docs Updated:** `HISTORY.md`, `PROGRESS_REPORT.md`
+
+---
+
+## [2026-09-15 23:10] - Master Bug Fix & Full Functional E2E Integration
+- **Scope:** Complete Application Debugging, PDF.js Viewer Canvas Integration, Database Vector Schema Sync, RAG Engine Grounding, and Synthesis Features.
+- **Root Cause & Fix Summary:**
+  1. **PDF Viewer Page 1 Render Bug Fixed**: Replaced static mock text in `pdf-viewer.tsx` with real PDF.js canvas renderer. Implemented dynamic page count (`pdfDoc.numPages`), canvas rendering per `currentPage`, Previous/Next controls, zoom scaling, and normalized relative bounding box highlight overlays (`x0`, `y0`, `w`, `h` in 0.0 - 1.0).
+  2. **Upload & Storage Lifecycle Integrated**: Updated `backend-core/src/routes/paper.ts` to trigger Python AI backend ingestion (`/api/v1/ingest-paper`) upon PDF upload and serve PDF static assets with CORS and byte-range support.
+  3. **Prisma Schema & Vector Dimension Synced**: Updated `schema.prisma` embedding vector dimension from 1536 to 768 to match `sentence-transformers/all-mpnet-base-v2`. Generated fresh Prisma Client.
+  4. **Full Multi-Page PDF Ingestion Validated**: Ingested multi-page test PDF fixture (`test-5page-paper.pdf`). Verified PyMuPDF extracted text blocks across all 5 distinct pages.
+  5. **RAG Grounded Synthesis & Citation Highlighting Verified**: Confirmed dense search + sparse tsvector + RRF fusion (k=60) + FlashRank reranking returning grounded citations for Page 1 through Page 5 with normalized canvas bounding box overlays.
+  6. **Summarization, Comparison & Flashcards Connected**: Added `/api/v1/summarize-paper` endpoint in `backend-ai`, hooked frontend Summaries tab (`5 Lines`, `1 Page`, `Detailed`), and connected real ingested chunks to Matrix Comparison, Literature Review, and Flashcards.
+- **Files Modified/Created:**
+  - `frontend/src/components/pdf-viewer.tsx`
+  - `frontend/src/components/PDFViewer.tsx`
+  - `frontend/src/app/paper/[id]/page.tsx`
+  - `frontend/src/lib/api.ts`
+  - `frontend/next.config.js`
+  - `backend-core/prisma/schema.prisma`
+  - `backend-core/src/prisma/schema.prisma`
+  - `backend-core/src/routes/paper.ts`
+  - `backend-core/src/server.ts`
+  - `backend-core/src/scripts/test-e2e-rag.ts`
+  - `backend-ai/app/models/schemas.py`
+  - `backend-ai/app/services/rag_engine.py`
+  - `backend-ai/app/routers/rag.py`
+  - `backend-ai/tests/fixtures/test-5page-paper.pdf`
+- **Docs Updated:** `HISTORY.md`, `PROGRESS_REPORT.md`, `TODO_ROADMAP.md`
+
