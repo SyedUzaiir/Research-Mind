@@ -1,0 +1,175 @@
+// AntiGravity AI — Prisma Schema Definition with pgvector support
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [pgvector(map: "vector")]
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum PaperStatus {
+  PENDING
+  PROCESSING
+  INDEXED
+  FAILED
+}
+
+model User {
+  id           String            @id @default(uuid())
+  email        String            @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+
+  ownedWorkspaces Workspace[]       @relation("WorkspaceOwner")
+  memberships     WorkspaceMember[]
+  uploadedPapers  Paper[]           @relation("UserUploadedPapers")
+  annotations     Annotation[]
+  chatHistories   ChatHistory[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id          String            @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User              @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  members          WorkspaceMember[]
+  papers           Paper[]
+  chatHistories    ChatHistory[]
+  synthesisReports SynthesisReport[]
+
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  id          String    @id @default(uuid())
+  workspaceId String
+  userId      String
+  role        Role      @default(VIEWER)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@unique([workspaceId, userId])
+  @@map("workspace_members")
+}
+
+model Paper {
+  id          String      @id @default(uuid())
+  workspaceId String
+  workspace   Workspace   @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploadedBy  String
+  uploader    User        @relation("UserUploadedPapers", fields: [uploadedBy], references: [id], onDelete: Cascade)
+  title       String
+  authors     String[]    @default([])
+  year        Int?
+  journal     String?
+  abstract    String?
+  fileUrl     String
+  fileSize    Int?
+  status      PaperStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  chunks        PaperChunk[]
+  annotations   Annotation[]
+  chatHistories ChatHistory[]
+  flashcards    Flashcard[]
+
+  @@map("papers")
+}
+
+model PaperChunk {
+  id          String                       @id @default(uuid())
+  paperId     String
+  paper       Paper                        @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  chunkIndex  Int
+  text        String
+  embedding   Unsupported("vector(1536)")?
+  pageNumber  Int
+  boundingBox Json
+  createdAt   DateTime                     @default(now())
+
+  @@index([paperId, chunkIndex])
+  @@map("paper_chunks")
+}
+
+model Annotation {
+  id            String   @id @default(uuid())
+  paperId       String
+  paper         Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pageNumber    Int
+  highlightText String
+  userNote      String?
+  color         String   @default("#FFD166")
+  boundingBox   Json
+  createdAt     DateTime @default(now())
+
+  @@map("annotations")
+}
+
+model ChatHistory {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  paperId     String?
+  paper       Paper?    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question    String
+  answer      String
+  citations   Json
+  createdAt   DateTime  @default(now())
+
+  @@map("chat_histories")
+}
+
+model Flashcard {
+  id         String     @id @default(uuid())
+  paperId    String
+  paper      Paper      @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  question   String
+  answer     String
+  difficulty Difficulty @default(MEDIUM)
+  createdAt  DateTime   @default(now())
+
+  @@map("flashcards")
+}
+
+model SynthesisReport {
+  id          String    @id @default(uuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  title       String
+  paperIds    String[]
+  matrixData  Json
+  reviewText  String
+  createdAt   DateTime  @default(now())
+
+  @@map("synthesis_reports")
+}
