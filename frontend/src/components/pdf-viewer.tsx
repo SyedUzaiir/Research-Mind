@@ -87,7 +87,7 @@ export const PdfViewer: React.FC<PDFViewerProps> = ({
             <div className="text-center pb-4 border-b border-zinc-200">
               <h1 className="text-base font-bold text-zinc-900 mb-1">{paperTitle}</h1>
               <p className="text-[10px] text-zinc-600 italic">
-                Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit — Google Brain & Research
+                Research Paper Document — Ingested via ResearchMind PyMuPDF Parser
               </p>
               <p className="text-[9px] text-zinc-500 font-sans mt-1">Page {currentPage}</p>
             </div>
@@ -95,7 +95,7 @@ export const PdfViewer: React.FC<PDFViewerProps> = ({
             {currentPage === 1 && (
               <div className="bg-zinc-50 p-3.5 rounded border-l-2 border-zinc-900 font-sans text-[11px] text-zinc-800 leading-normal">
                 <strong className="block text-zinc-900 font-bold mb-1">Abstract</strong>
-                The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.
+                Layout-aware text extracted from <strong>{paperTitle}</strong>. PyMuPDF normalizes all paragraph boundaries into percentage-based relative coordinates for instant canvas highlight mapping.
               </div>
             )}
 
@@ -103,28 +103,28 @@ export const PdfViewer: React.FC<PDFViewerProps> = ({
               <div>
                 <h3 className="font-sans font-bold text-[11px] text-zinc-900 mb-1 uppercase tracking-wider">1. Introduction</h3>
                 <p className="mb-2">
-                  Recurrent neural networks, particularly long short-term memory (LSTM) and gated recurrent (GRU) neural networks, have been firmly established as state of the art approaches in sequence modeling and transduction problems such as language modeling and machine translation.
+                  Modern deep learning architectures demand high representation capacity and efficient parameterization. This research investigates structural trade-offs in neural modeling.
                 </p>
                 <p>
-                  Recurrent models typically factor computation along the symbol positions of the input and output sequences. Aligning the positions to steps in computation time, they generate a sequence of hidden states h_t, as a function of the previous hidden state h_t-1 and the input for position t.
+                  Recurrent models factor computation along symbol positions, whereas global attention mechanisms allow parallel sequence evaluation.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-sans font-bold text-[11px] text-zinc-900 mb-1 uppercase tracking-wider">2. Model Architecture</h3>
+                <h3 className="font-sans font-bold text-[11px] text-zinc-900 mb-1 uppercase tracking-wider">2. Methodology</h3>
                 <p className="mb-2">
-                  Most competitive neural sequence transduction models have an encoder-decoder structure. Here, the encoder maps an input sequence of symbol representations (x_1, ..., x_n) to a sequence of continuous representations z = (z_1, ..., z_n).
+                  Our proposed pipeline formulates vector representations using dense embeddings paired with sparse lexical full-text retrieval streams.
                 </p>
                 <p>
-                  Given z, the decoder then generates an output sequence (y_1, ..., y_m) of symbols one element at a time. At each step the model is auto-regressive, consuming the previously generated symbols as additional input when generating the next.
+                  Candidate rankings are fused using Reciprocal Rank Fusion (RRF) and cross-encoder reranking to ensure grounded accuracy.
                 </p>
               </div>
             </div>
 
             {currentPage === 3 && (
               <div className="p-3 bg-amber-50 rounded border border-amber-200 text-[10.5px]">
-                <strong className="block text-amber-900 font-bold mb-1">3.2 Multi-Head Attention</strong>
-                Multi-head attention allows the model to jointly attend to information from different representation subspaces at different positions. With a single attention head, averaging inhibits this.
+                <strong className="block text-amber-900 font-bold mb-1">3. Experimental Evaluation</strong>
+                Multi-head attention projections allow the model to jointly attend to representations across different subspace dimensions.
               </div>
             )}
           </div>

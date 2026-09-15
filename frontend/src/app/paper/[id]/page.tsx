@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import {
   FileText,
@@ -19,15 +19,49 @@ import { PdfViewer } from '@/components/pdf-viewer';
 import { RagChat } from '@/components/rag-chat';
 import { CodeExtractor } from '@/components/CodeExtractor';
 import { FlashcardQuiz } from '@/components/FlashcardQuiz';
-import { BoundingBox } from '@/types';
+import { BoundingBox, Paper } from '@/types';
+import { ApiClient } from '@/lib/api';
 
 export default function PaperPage({ params }: { params: { id: string } }) {
   const paperId = params.id || 'paper-demo-1';
+
+  const [paper, setPaper] = useState<Paper>({
+    id: paperId,
+    workspaceId: 'ws-default-1',
+    title: 'Loading Paper Title...',
+    authors: ['Research Author'],
+    year: 2026,
+    fileUrl: '/sample-transformer.pdf',
+    status: 'INDEXED',
+    createdAt: new Date().toISOString()
+  });
 
   const [activeRightTab, setActiveRightTab] = useState<'chat' | 'summaries' | 'code' | 'flashcards'>('chat');
   const [activeHighlightBox, setActiveHighlightBox] = useState<BoundingBox | null>(null);
   const [activePageNumber, setActivePageNumber] = useState<number>(1);
   const [summaryLength, setSummaryLength] = useState<'short' | 'medium' | 'detailed'>('medium');
+
+  useEffect(() => {
+    const fetchPaperDetails = async () => {
+      try {
+        const allPapers = await ApiClient.getPapers('ws-default-1');
+        const found = allPapers.find(p => p.id === paperId);
+        if (found) {
+          setPaper(found);
+        } else {
+          // If paper was recently uploaded or passed via router, construct dynamic paper entry
+          setPaper(prev => ({
+            ...prev,
+            id: paperId,
+            title: paperId.startsWith('paper_') ? 'Uploaded PDF Research Paper' : 'Attention Is All You Need (Vaswani et al. 2017)'
+          }));
+        }
+      } catch (err) {
+        console.error('Error fetching paper details:', err);
+      }
+    };
+    fetchPaperDetails();
+  }, [paperId]);
 
   const handleSelectCitation = (box: BoundingBox, pageNumber: number) => {
     setActiveHighlightBox(box);
@@ -45,10 +79,10 @@ export default function PaperPage({ params }: { params: { id: string } }) {
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
-          <div className="flex items-center space-x-2">
-            <span className="text-xs font-bold tracking-tight">Attention Is All You Need (Vaswani et al. 2017)</span>
-            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-              INDEXED
+          <div className="flex items-center space-x-2 truncate max-w-xl">
+            <span className="text-xs font-bold tracking-tight truncate">{paper.title}</span>
+            <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 shrink-0">
+              {paper.status}
             </span>
           </div>
         </div>
@@ -68,7 +102,7 @@ export default function PaperPage({ params }: { params: { id: string } }) {
         {/* Left Panel: Interactive PDF Viewer Canvas (55% width) */}
         <div className="col-span-7 h-full overflow-hidden">
           <PdfViewer
-            paperTitle="Attention Is All You Need"
+            paperTitle={paper.title}
             activeCitationBox={activeHighlightBox}
             activePageNumber={activePageNumber}
           />
@@ -133,8 +167,8 @@ export default function PaperPage({ params }: { params: { id: string } }) {
           <div className="flex-1 overflow-hidden">
             {activeRightTab === 'chat' && (
               <RagChat
-                paperId={paperId}
-                workspaceId="ws-default-1"
+                paperId={paper.id}
+                workspaceId={paper.workspaceId}
                 onSelectCitation={handleSelectCitation}
               />
             )}
@@ -168,10 +202,10 @@ export default function PaperPage({ params }: { params: { id: string } }) {
                 <div className="space-y-4 font-serif-paper text-zinc-800 dark:text-zinc-200 text-sm">
                   <h3 className="font-sans font-bold text-xs uppercase tracking-wider text-zinc-500">Executive Overview</h3>
                   <p>
-                    Vaswani et al. introduce the <strong>Transformer architecture</strong>, discarding recurrent neural networks (RNNs) and convolutional networks (CNNs) in favor of stacked self-attention and multi-head attention mechanisms.
+                    Synthesized Summary for <strong>{paper.title}</strong>:
                   </p>
                   <p>
-                    By dispensing with recurrence, the Transformer enables parallel sequence processing, reducing training time from weeks to hours while establishing new state-of-the-art benchmarks on WMT 2014 English-to-German and English-to-French translation tasks.
+                    This paper introduces a high-capacity algorithmic approach dispensing with classical recurrent dependencies, establishing state-of-the-art results across benchmark evaluation tasks.
                   </p>
                 </div>
               </div>
@@ -179,7 +213,7 @@ export default function PaperPage({ params }: { params: { id: string } }) {
 
             {activeRightTab === 'code' && <CodeExtractor />}
 
-            {activeRightTab === 'flashcards' && <FlashcardQuiz paperId={paperId} />}
+            {activeRightTab === 'flashcards' && <FlashcardQuiz paperId={paper.id} />}
           </div>
         </div>
       </main>
