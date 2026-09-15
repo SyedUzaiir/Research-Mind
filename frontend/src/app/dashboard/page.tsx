@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   FileText,
@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const [papers, setPapers] = useState<Paper[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -45,24 +46,30 @@ export default function DashboardPage() {
     loadDashboard();
   }, []);
 
-  const handleSimulatedUpload = () => {
+  const handleUploadTargetClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
     setUploading(true);
-    setTimeout(() => {
-      const newPaper: Paper = {
-        id: `paper_${Date.now()}`,
-        workspaceId: 'ws-default-1',
-        title: 'Mastering the Game of Go with Deep Neural Networks',
-        authors: ['David Silver', 'Aja Huang', 'Demis Hassabis'],
-        year: 2016,
-        journal: 'Nature',
-        abstract: 'We introduce a algorithm using deep neural networks and tree search...',
-        fileUrl: '/sample-alphago.pdf',
-        status: 'INDEXED',
-        createdAt: new Date().toISOString()
-      };
+
+    try {
+      const newPaper = await ApiClient.uploadPaper(file, workspaces[0]?.id || 'ws-default-1');
       setPapers(prev => [newPaper, ...prev]);
+    } catch (err) {
+      console.error('File upload error:', err);
+    } finally {
       setUploading(false);
-    }, 1500);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   const filteredPapers = papers.filter(p =>
@@ -72,6 +79,15 @@ export default function DashboardPage() {
 
   return (
     <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 font-sans overflow-hidden transition-colors">
+      {/* Hidden Native File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept=".pdf"
+        className="hidden"
+      />
+
       {/* Collapsible Left Sidebar (Linear / Notion Inspired) */}
       <aside
         className={`${
@@ -207,13 +223,13 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex items-center space-x-3">
-            <Link
-              href="/paper/paper-demo-1"
+            <button
+              onClick={handleUploadTargetClick}
               className="flex items-center space-x-1.5 bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900 text-xs font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm"
             >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Open Reader Workspace</span>
-            </Link>
+              <UploadCloud className="w-3.5 h-3.5" />
+              <span>Upload PDF Paper</span>
+            </button>
           </div>
         </header>
 
@@ -221,7 +237,7 @@ export default function DashboardPage() {
         <div className="flex-1 overflow-auto p-6 space-y-6">
           {/* Drag & Drop Quick Upload Target Zone */}
           <div
-            onClick={handleSimulatedUpload}
+            onClick={handleUploadTargetClick}
             className="ui-card p-6 border-dashed border-2 border-zinc-300 dark:border-zinc-700/80 bg-zinc-50/50 dark:bg-zinc-900/40 hover:border-zinc-900 dark:hover:border-zinc-100 transition-colors cursor-pointer text-center space-y-2 rounded-2xl"
           >
             <div className="w-10 h-10 rounded-full bg-zinc-200/80 dark:bg-zinc-800 flex items-center justify-center mx-auto text-zinc-700 dark:text-zinc-300">
@@ -229,16 +245,16 @@ export default function DashboardPage() {
             </div>
             <div>
               <h3 className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
-                {uploading ? 'Parsing PDF Layout & Calculating Relative Bounding Boxes...' : 'Drag & Drop PDF Paper Here'}
+                {uploading ? 'Parsing PDF Layout & Calculating Relative Bounding Boxes...' : 'Click to Upload Research PDF Paper'}
               </h3>
               <p className="text-[11px] text-zinc-500 dark:text-zinc-400">
-                Supports PDF, DOCX, and TXT files up to 50MB. Auto-chunks & indexes vector embeddings.
+                Supports any research PDF document. Auto-extracts layout text, headings, and index vectors.
               </p>
             </div>
             {uploading && (
               <div className="flex items-center justify-center space-x-2 text-xs text-amber-500 pt-1 font-mono">
                 <Sparkles className="w-4 h-4 animate-spin" />
-                <span>Running PyMuPDF Layout Extraction...</span>
+                <span>Running PyMuPDF Layout Extraction & Embedding Generation...</span>
               </div>
             )}
           </div>
