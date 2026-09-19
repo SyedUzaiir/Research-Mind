@@ -1,7 +1,7 @@
-# AntiGravity AI — Database ERD & Schema Specification
+# ResearchMind — Database ERD & Schema Specification
 
 ## 1. Overview
-AntiGravity AI uses PostgreSQL with the `pgvector` extension, managed via **Prisma ORM**.
+ResearchMind uses PostgreSQL with the `pgvector` extension, managed via **Prisma ORM**.
 
 ## 2. Table Specifications
 

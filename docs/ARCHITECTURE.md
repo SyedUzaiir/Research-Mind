@@ -1,7 +1,7 @@
-# AntiGravity AI — Architecture & Microservice Specification
+# ResearchMind — Architecture & Microservice Specification
 
 ## 1. System Overview
-AntiGravity AI is built using a decoupled dual-backend microservice architecture paired with a Next.js 14 single-page workspace application.
+ResearchMind is built using a decoupled dual-backend microservice architecture paired with a Next.js 14 single-page workspace application.
 
 ```
                                   +-----------------------+

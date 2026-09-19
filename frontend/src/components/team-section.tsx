@@ -46,7 +46,7 @@ export const TeamSection: React.FC = () => {
             Built by three students.
           </h2>
           <p className="text-xs font-medium text-zinc-600 dark:text-zinc-400">
-            Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2025–26.
+            Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2026–27.
           </p>
         </div>
 

@@ -1,7 +1,7 @@
 # ResearchMind — Complete Technical & Functional Documentation
 
 **Project Title:** ResearchMind — Academic Workspace & Grounded RAG Platform  
-**Institution:** Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2025–2026 Major Project)  
+**Institution:** Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2026–2027 Major Project)  
 **Repository:** [https://github.com/SyedUzaiir/Research-Mind.git](https://github.com/SyedUzaiir/Research-Mind.git)  
 **Version:** 1.0.0 (Production Candidate)  
 **Document Generated:** September 2026
@@ -512,7 +512,7 @@ ResearchMind began as a B.Tech major capstone thesis addressing how researchers 
 ## 29. Final Viva Cheat Sheet
 
 - **Project:** ResearchMind — Academic Workspace & Grounded RAG Platform
-- **Institution:** Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2025–26)
+- **Institution:** Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2026–27)
 - **Frontend:** Next.js 14 App Router, Tailwind CSS, `next-themes`
 - **Core Backend:** Node.js Express, Prisma ORM, JWT, Bcrypt
 - **AI Backend:** Python FastAPI, PyMuPDF, `sentence-transformers`, `FlashRank`, Gemini 1.5

@@ -1,7 +1,7 @@
 # ResearchMind — Current System Progress Report
 
 **Project Name:** ResearchMind — Academic Workspace & Grounded RAG Platform  
-**Institution:** Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2025–2026 Major Project)  
+**Institution:** Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2026–2027 Major Project)  
 **Repository:** [https://github.com/SyedUzaiir/Research-Mind.git](https://github.com/SyedUzaiir/Research-Mind.git)  
 **Status:** Core Platform Architecture, PDF.js Canvas Reader, PostgreSQL pgvector RRF, RAG Chat, and AI Synthesis Features 100% Implemented, Debugged & E2E Verified 🟢
 
@@ -22,7 +22,7 @@
 | **Python AI Engine (`backend-ai`)** | PyMuPDF percentage bounding-box parser, layout-aware semantic chunker, RRF vector search, FlashRank reranker, RAG engine, Semantic Scholar client | ✅ Complete |
 | **Core Node API (`backend-core`)** | Express.js API with TypeScript, JWT authentication, Workspace CRUD, Multer PDF file uploads, Annotations API | ✅ Complete |
 | **Frontend Workspace (`frontend`)** | Next.js 14 App Router, Tailwind CSS, `next-themes` Light/Dark mode, Split-Screen PDF reader canvas, RAG chat sidebar, Literature matrix, Citation graph | ✅ Complete |
-| **Team Showcase** | Integrated B.Tech Major Project team details for **Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2025–26** | ✅ Complete |
+| **Team Showcase** | Integrated B.Tech Major Project team details for **Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2026–27** | ✅ Complete |
 | **Environment & Git Setup** | `.env.example` templates, Supabase URL encoding, `.gitignore`, GitHub repository initialized and pushed to `main` branch | ✅ Complete |
 
 ---

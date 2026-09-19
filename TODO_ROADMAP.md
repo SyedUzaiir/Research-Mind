@@ -69,9 +69,9 @@ This document outlines all remaining tasks, production deployment steps, asynchr
 
 ---
 
-## 🎓 Phase 6: B.Tech Major Project Capstone Deliverables (2025–2026)
+## 🎓 Phase 6: B.Tech Major Project Capstone Deliverables (2026–2027)
 
 - [ ] **6.1 Project Thesis Documentation**:
-  - Finalize B.Tech Major Project thesis report for **Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2025–26)**.
+  - Finalize B.Tech Major Project thesis report for **Vardhaman College of Engineering, Hyderabad — B.Tech CSE (2026–27)**.
 - [ ] **6.2 Live Presentation Slides & Demo Video**:
   - Create capstone presentation slides detailing system architecture, RRF mathematical formulas, and live platform demo video.

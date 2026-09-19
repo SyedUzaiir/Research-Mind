@@ -1,4 +1,4 @@
-# AntiGravity AI — Features & User Guide
+# ResearchMind — Features & User Guide
 
 ## 1. Grounded PDF Workspace Reader
 - Split-screen workspace layout.

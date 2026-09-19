@@ -1,4 +1,4 @@
-# AntiGravity AI — RAG Pipeline & Citation Specification
+# ResearchMind — RAG Pipeline & Citation Specification
 
 ## 1. Document Ingestion & Layout Parsing
 

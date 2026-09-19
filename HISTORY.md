@@ -75,9 +75,9 @@ All major changes, database updates, microservice additions, and pipeline enhanc
 
 ---
 
-## [2026-09-15 07:44] - Team Section Update (Vardhaman College of Engineering, 2025–26)
+## [2026-09-15 07:44] - Team Section Update (Vardhaman College of Engineering, 2026–27)
 - **Scope:** Team Section Component (`frontend/src/components/team-section.tsx`)
-- **Summary:** Updated team section with exact metadata: **Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2025–26** and member profiles (Syed Uzair Mohiuddin, Sarasam Chinmaee Reddy, Manohar Yadav Boddu).
+- **Summary:** Updated team section with exact metadata: **Vardhaman College of Engineering, Hyderabad — B.Tech CSE, 2026–27** and member profiles (Syed Uzair Mohiuddin, Sarasam Chinmaee Reddy, Manohar Yadav Boddu).
 - **Files Modified:**
   - `frontend/src/components/team-section.tsx`
 
